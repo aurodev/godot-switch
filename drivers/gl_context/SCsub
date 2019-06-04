@@ -2,9 +2,13 @@
 
 Import('env')
 
-if (env["platform"] in ["haiku", "osx", "windows", "x11"]):
+if (env["platform"] in ["haiku", "osx", "windows", "x11", "switch"]):
     # Thirdparty source files
-    thirdparty_dir = "#thirdparty/glad/"
+    if env["platform"] == "switch":
+        thirdparty_dir = "#thirdparty/glad-switch/"
+    else:
+        thirdparty_dir = "#thirdparty/glad/"
+
     thirdparty_sources = [
         "glad.c",
     ]

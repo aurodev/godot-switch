@@ -112,6 +112,7 @@ def make_default_controller_mappings(target, source, env):
         "iOS": "#ifdef IPHONE_ENABLED",
         "Javascript": "#ifdef JAVASCRIPT_ENABLED",
         "UWP": "#ifdef UWP_ENABLED",
+        "Switch": "#ifdef SWITCH_ENABLED",
     }
 
     g.write("const char* DefaultControllerMappings::mappings[] = {\n")

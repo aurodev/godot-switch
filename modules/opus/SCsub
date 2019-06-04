@@ -225,7 +225,7 @@ if env['builtin_opus']:
             env_opus.Append(CFLAGS=["-DOPUS_ARM_OPT"])
         elif ("android_arch" in env and env["android_arch"] == "arm64v8"):
             env_opus.Append(CFLAGS=["-DOPUS_ARM64_OPT"])
-    elif env["platform"] == "iphone":
+    elif env["platform"] in ["iphone", "switch"]:
         if ("arch" in env and env["arch"] == "arm"):
             env_opus.Append(CFLAGS=["-DOPUS_ARM_OPT"])
         elif ("arch" in env and env["arch"] == "arm64"):

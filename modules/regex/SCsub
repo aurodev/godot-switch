@@ -6,7 +6,7 @@ Import('env_modules')
 env_regex = env_modules.Clone()
 
 if env['builtin_pcre2']:
-    jit_blacklist = ['javascript', 'uwp']
+    jit_blacklist = ['javascript', 'uwp', "switch"]
 
     thirdparty_dir = '#thirdparty/pcre2/src/'
     thirdparty_flags = ['-DPCRE2_STATIC', '-DHAVE_CONFIG_H']

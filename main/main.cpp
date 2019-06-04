@@ -1243,12 +1243,16 @@ Error Main::setup2(Thread::ID p_main_tid_override) {
 
 	MAIN_PRINT("Main: Load Translations");
 
+        // TODO (fhidalgo): check why this doesn't work
+        /*
 	translation_server->setup(); //register translations, load them, etc.
 	if (locale != "") {
 
 		translation_server->set_locale(locale);
 	}
 	translation_server->load_translations();
+	*/
+
 	ResourceLoader::load_translation_remaps(); //load remaps for resources
 
 	ResourceLoader::load_path_remaps();

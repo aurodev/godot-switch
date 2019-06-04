@@ -54,7 +54,9 @@
 #endif
 
 #include <assert.h>
+#ifndef NO_DL
 #include <dlfcn.h>
+#endif // NO_DL
 #include <errno.h>
 #include <poll.h>
 #include <signal.h>
@@ -78,7 +80,7 @@ static void _setup_clock() {
 	_clock_start = mach_absolute_time() * _clock_scale;
 }
 #else
-#if defined(CLOCK_MONOTONIC_RAW) && !defined(JAVASCRIPT_ENABLED) // This is a better clock on Linux.
+#if defined(CLOCK_MONOTONIC_RAW) && !defined(JAVASCRIPT_ENABLED) && !defined(SWITCH_ENABLED) // This is a better clock on Linux.
 #define GODOT_CLOCK CLOCK_MONOTONIC_RAW
 #else
 #define GODOT_CLOCK CLOCK_MONOTONIC
@@ -105,13 +107,14 @@ static void handle_interrupt(int sig) {
 }
 
 void OS_Unix::initialize_debugging() {
-
+#ifndef SWITCH_ENABLED
 	if (ScriptDebugger::get_singleton() != NULL) {
 		struct sigaction action;
 		memset(&action, 0, sizeof(action));
 		action.sa_handler = handle_interrupt;
 		sigaction(SIGINT, &action, NULL);
 	}
+#endif
 }
 
 int OS_Unix::unix_initialize_audio(int p_audio_driver) {
@@ -121,12 +124,15 @@ int OS_Unix::unix_initialize_audio(int p_audio_driver) {
 
 // Very simple signal handler to reap processes where ::execute was called with
 // !p_blocking
+#ifndef __SWITCH__
+// no waitpid, sigaction (in initialize_core) and SA_RESTART (in initialize_core)
 void handle_sigchld(int sig) {
 	int saved_errno = errno;
 	while (waitpid((pid_t)(-1), 0, WNOHANG) > 0) {
 	}
 	errno = saved_errno;
 }
+#endif
 
 void OS_Unix::initialize_core() {
 
@@ -156,18 +162,23 @@ void OS_Unix::initialize_core() {
 
 	_setup_clock();
 
+#ifndef __SWITCH__
 	struct sigaction sa;
 	sa.sa_handler = &handle_sigchld;
 	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+	// TODO (fhidalgo): check SA_RESTART signal and what does this do
+	//	sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
 	if (sigaction(SIGCHLD, &sa, 0) == -1) {
 		perror("ERROR sigaction() failed:");
 	}
+#endif
+
 }
 
 void OS_Unix::finalize_core() {
-
+#ifndef NO_NETWORK
 	NetSocketPosix::cleanup();
+#endif
 }
 
 void OS_Unix::alert(const String &p_alert, const String &p_title) {
@@ -295,7 +306,7 @@ uint64_t OS_Unix::get_ticks_usec() const {
 
 Error OS_Unix::execute(const String &p_path, const List<String> &p_arguments, bool p_blocking, ProcessID *r_child_id, String *r_pipe, int *r_exitcode, bool read_stderr) {
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) || defined(SWITCH_ENABLED)
 	// Don't compile this code at all to avoid undefined references.
 	// Actual virtual call goes to OS_JavaScript.
 	ERR_FAIL_V(ERR_BUG);
@@ -372,11 +383,13 @@ Error OS_Unix::execute(const String &p_path, const List<String> &p_arguments, bo
 Error OS_Unix::kill(const ProcessID &p_pid) {
 
 	int ret = ::kill(p_pid, SIGKILL);
+#ifndef SWITCH_ENABLED  // switch doesn't have waitpid system call
 	if (!ret) {
 		//avoid zombie process
 		int st;
 		::waitpid(p_pid, &st, 0);
 	}
+#endif
 	return ret ? ERR_INVALID_PARAMETER : OK;
 }
 
@@ -402,6 +415,7 @@ String OS_Unix::get_locale() const {
 	return locale;
 }
 
+#ifndef NO_DL
 Error OS_Unix::open_dynamic_library(const String p_path, void *&p_library_handle, bool p_also_set_library_path) {
 
 	String path = p_path;
@@ -454,6 +468,7 @@ Error OS_Unix::get_dynamic_library_symbol_handle(void *p_library_handle, const S
 	}
 	return OK;
 }
+#endif // NO_DL
 
 Error OS_Unix::set_cwd(const String &p_cwd) {
 
@@ -476,8 +491,12 @@ bool OS_Unix::set_environment(const String &p_var, const String &p_value) const 
 }
 
 int OS_Unix::get_processor_count() const {
-
+#ifndef SWITCH_ENABLED
 	return sysconf(_SC_NPROCESSORS_CONF);
+#else
+	// there are 8 processors but only 4 can work at one time (ARM big.LITTLE)
+	return 4;
+#endif
 }
 
 String OS_Unix::get_user_data_dir() const {

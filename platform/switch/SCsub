@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+
+import os
+import platform
+import sys
+
+Import('env')
+
+common_switch = [
+    "os_switch.cpp",
+    "context_gl_switch.cpp",
+    "joypad_switch.cpp",
+    "audio_driver_switch.cpp",
+]
+
+prog = env.add_program('#bin/godot_switch', ['godot_switch.cpp'] + common_switch)

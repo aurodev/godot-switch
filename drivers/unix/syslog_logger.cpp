@@ -30,6 +30,8 @@
 
 #ifdef UNIX_ENABLED
 
+#ifndef NO_SYSLOG
+
 #include "syslog_logger.h"
 #include "core/print_string.h"
 #include <syslog.h>
@@ -67,5 +69,7 @@ void SyslogLogger::print_error(const char *p_function, const char *p_file, int p
 
 SyslogLogger::~SyslogLogger() {
 }
+
+#endif // NO_SYSLOG
 
 #endif

@@ -30,6 +30,8 @@
 
 #include "ip_unix.h"
 
+#ifndef NO_NETWORK
+
 #if defined(UNIX_ENABLED) || defined(WINDOWS_ENABLED)
 
 #include <string.h>
@@ -244,3 +246,5 @@ IP_Unix::IP_Unix() {
 }
 
 #endif
+
+#endif // NO_NETWORK
