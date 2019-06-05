@@ -2,6 +2,12 @@
 
 This is an unofficial port of the godot engine for the Nintendo Switch.
 
+#### Status
+* Only one joycon supported
+* No sound
+* No network
+* No gdnative module
+
 #### Requirements
 Working devkitpro environment (https://devkitpro.org)
 
@@ -26,3 +32,6 @@ The following steps can be used to generate an nro of the game:
 2. Create the nacp file: `/opt/devkitpro/tools/bin/nacptool --create application <GAME_NAME> <VERSION> <NACP_NAME>.nacp`
 3. Create nro file: `/opt/devkitpro/tools/bin/elf2nro godot_switch.switch.opt.arm64 <NAME>.nro --icon=/opt/devkitpro/libnx/default_icon.jpg --nacp=<NACP_NAME>.nacp --romfsdir=<PACK_FILE_DIR>`
 4. Copy file to switch and run, nxlink can be used to send file over the network: `/opt/devkitpro/tools/bin/nxlink <NAME>.nro -s` ('-s' will create a local server that will listen for logs if using a debug version)
+
+#### Contributing
+When I started this project I had little idea about C++ or Godot, so there are likely a lot of things that can be improved, any help is welcome.
