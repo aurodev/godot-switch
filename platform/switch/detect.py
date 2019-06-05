@@ -1,7 +1,7 @@
 import os
 import platform
 import sys
-from methods import get_compiler_version, use_gcc
+from methods import get_compiler_version, using_gcc
 
 def is_active():
     return True
