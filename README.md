@@ -1,71 +1,28 @@
-[![Godot Engine logo](/logo.png)](https://godotengine.org)
+## Godot engine port for the Nintendo Switch Homebrew
 
-## Godot Engine
+This is an unofficial port of the godot engine for the Nintendo Switch.
 
-Homepage: https://godotengine.org
+#### Requirements
+Working devkitpro environment (https://devkitpro.org)
 
-#### 2D and 3D cross-platform game engine
+#### Compiling
+Compilation is done in the same way that you would compile any of the devkitpro examples. Requirements are also the same. The following devkitpro packages are used:
+switch-dev
+switch-bulletphysics
+switch-glm
+switch-libdrm_nouveau
+switch-libopus
+switch-mbedtls
+switch-opusfile
+switch-zlib
 
-Godot Engine is a feature-packed, cross-platform game engine to create 2D and
-3D games from a unified interface. It provides a comprehensive set of common
-tools, so that users can focus on making games without having to reinvent the
-wheel. Games can be exported in one click to a number of platforms, including
-the major desktop platforms (Linux, Mac OSX, Windows) as well as mobile
-(Android, iOS) and web-based (HTML5) platforms.
+Example command: `DEVKITPRO="/opt/devkitpro" scons platform=switch verbose=1 -j4 target=release`
 
-#### Free, open source and community-driven
+#### Using the "exporter"
+While there are no exporters created for the switch, the release provides a precompiled exporter for the switch. In order to make things easier I decided to make it a requirement to bundle the game pack into romfs with the godot executable. The main pack should be named main.pck and reside in <PACK_FILE_DIR>.
 
-Godot is completely free and open source under the very permissive MIT license.
-No strings attached, no royalties, nothing. The users' games are theirs, down
-to the last line of engine code. Godot's development is fully independent and
-community-driven, empowering users to help shape their engine to match their
-expectations. It is supported by the Software Freedom Conservancy
-not-for-profit.
-
-Before being open sourced in February 2014, Godot had been developed by Juan
-Linietsky and Ariel Manzur (both still maintaining the project) for several
-years as an in-house engine, used to publish several work-for-hire titles.
-
-![Screenshot of a 3D scene in Godot Engine](https://download.tuxfamily.org/godotengine/media/screenshots/editor_3d_fracteed.jpg)
-
-### Getting the engine
-
-#### Binary downloads
-
-Official binaries for the Godot editor and the export templates can be found
-[on the homepage](https://godotengine.org/download).
-
-#### Compiling from source
-
-[See the official docs](https://docs.godotengine.org/en/latest/development/compiling/)
-for compilation instructions for every supported platform.
-
-### Community and contributing
-
-Godot is not only an engine but an ever-growing community of users and engine
-developers. The main community channels are listed [on the homepage](https://godotengine.org/community).
-
-To get in touch with the developers, the best way is to join the
-[#godotengine IRC channel](https://webchat.freenode.net/?channels=godotengine)
-on Freenode.
-
-To get started contributing to the project, see the [contributing guide](CONTRIBUTING.md).
-
-### Documentation and demos
-
-The official documentation is hosted on [ReadTheDocs](https://docs.godotengine.org).
-It is maintained by the Godot community in its own [GitHub repository](https://github.com/godotengine/godot-docs).
-
-The [class reference](https://docs.godotengine.org/en/latest/classes/)
-is also accessible from within the engine.
-
-The official demos are maintained in their own [GitHub repository](https://github.com/godotengine/godot-demo-projects)
-as well.
-
-There are also a number of other learning resources provided by the community,
-such as text and video tutorials, demos, etc. Consult the [community channels](https://godotengine.org/community)
-for more info.
-
-[![Travis Build Status](https://travis-ci.org/godotengine/godot.svg?branch=master)](https://travis-ci.org/godotengine/godot)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/bfiihqq6byxsjxxh/branch/master?svg=true)](https://ci.appveyor.com/project/akien-mga/godot)
-[![Code Triagers Badge](https://www.codetriage.com/godotengine/godot/badges/users.svg)](https://www.codetriage.com/godotengine/godot)
+The following steps can be used to generate an nro of the game:
+1. Export a pack of the game you want to run to <PACK_FILE_DIR>/main.pck (use an existing expoter using s3tc textures, for example OSX)
+2. Create the nacp file: `/opt/devkitpro/tools/bin/nacptool --create application <GAME_NAME> <VERSION> <NACP_NAME>.nacp`
+3. Create nro file: `/opt/devkitpro/tools/bin/elf2nro godot_switch.switch.opt.arm64 <NAME>.nro --icon=/opt/devkitpro/libnx/default_icon.jpg --nacp=<NACP_NAME>.nacp --romfsdir=<PACK_FILE_DIR>`
+4. Copy file to switch and run, nxlink can be used to send file over the network: `/opt/devkitpro/tools/bin/nxlink <NAME>.nro -s` ('-s' will create a local server that will listen for logs if using a debug version)
