@@ -1,3 +1,5 @@
+A more complete version of this project is being hosted at: https://github.com/Stary2001/godot
+
 ## Godot engine port for the Nintendo Switch Homebrew
 
 This is an unofficial port of the godot engine for the Nintendo Switch.
